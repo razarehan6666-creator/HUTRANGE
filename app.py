@@ -1,59 +1,45 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, render_template, jsonify
 import pandas as pd
-import urllib.request
 
 app = Flask(__name__)
 
-# ✅ Google Sheet published link (CSV output)
-EXCEL_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPIR5j2TyzJAorJsGX9reIhOXQKrTfyDbbv2GreXPDf2nWcBCddhoedW93yEaK1S93imugCke-dRD_/pub?output=csv"
+GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPIR5j2TyzJAorJsGX9reIhOXQKrTfyDbbv2GreXPDf2nWcBCddhoedW93yEaK1S93imugCke-dRD_/pub?output=csv"
+
+def get_month_data(month_name):
+    try:
+        df = pd.read_csv(GOOGLE_SHEET_URL)
+        df.columns = df.columns.str.strip().str.upper()
+        month_name = month_name.strip().upper()
+
+        if 'MONTH' not in df.columns:
+            print("⚠️ Error: 'MONTH' column not found in sheet.")
+            return None
+
+        month_row = df[df['MONTH'].str.strip().str.upper() == month_name]
+        if month_row.empty:
+            print(f"No data found for month: {month_name}")
+            return None
+
+        return month_row.iloc[0].to_dict()
+    except Exception as e:
+        print("Error fetching sheet:", e)
+        return None
+
 
 @app.route('/')
 def home():
-    return render_template("index.html")   # make sure your html file is named 'index.html' and placed in 'templates' folder
+    return render_template("index.html")
 
-@app.route('/data/<month>')
-def get_month_data(month):
-    try:
-        # ✅ Read live data from Google Sheets
-        df = pd.read_csv(EXCEL_URL)
 
-        # ✅ Clean headers and data
-        df.columns = df.columns.str.strip().str.upper()
-        month = month.strip().upper()
-
-        # ✅ Find the row for that month
-        month_row = df[df['MONTH'] == month]
-
-        if month_row.empty:
-            return jsonify({})
-
-        row = month_row.iloc[0].to_dict()
-
-        # ✅ Ensure all values are converted to strings (safe for JSON)
-        data = {
-            "PAID": str(row.get("PAID", "-")),
-            "NO. OF DAYS IN MONTH": str(row.get("NO. OF DAYS IN MONTH", "-")),
-            "NO. OF DAYS ABSENT": str(row.get("NO. OF DAYS ABSENT", "-")),
-            "NO. OF DAYS COMING": str(row.get("NO. OF DAYS COMING", "-")),
-            "AMOUNT": str(row.get("AMOUNT", "-")),
-            "PAYMENT MODE": str(row.get("PAYMENT MODE", "-"))
-        }
-
+@app.route('/month/<month_name>')
+def month_data(month_name):
+    data = get_month_data(month_name)
+    if data:
         return jsonify(data)
-
-    except Exception as e:
-        print("Error:", e)
-        return jsonify({"error": str(e)})
-
-if __name__ == '__main__':
-    import os
-    port = int(os.environ.get('PORT', 5000))  # Render gives PORT automatically
-    app.run(host='0.0.0.0', port=port)
+    else:
+        return jsonify({"error": f"No data found for {month_name}"})
 
 
-
-
-
-
-
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
 
