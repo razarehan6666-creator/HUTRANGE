@@ -1,189 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Milk Data Viewer</title>
-    <style>
-        body {
-            background: linear-gradient(135deg, #FFD54F, #FFB300);
-            font-family: 'Poppins', sans-serif;
-            text-align: center;
-            padding: 20px;
-            color: #333;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Milk Tracker</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #89f7fe, #66a6ff);
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
 
-        h1 {
-            color: #3E2723;
-            font-size: 36px;
-            margin-bottom: 10px;
-        }
+    h1 {
+      font-size: 2.5em;
+      margin-top: 30px;
+    }
 
-        .month-buttons button {
-            background-color: #00838F;
-            border: none;
-            color: white;
-            padding: 12px 20px;
-            margin: 5px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
+    .month-buttons {
+      margin: 30px auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
 
-        .month-buttons button:hover {
-            background-color: #00ACC1;
-            transform: scale(1.05);
-        }
+    button {
+      background: white;
+      color: #333;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
 
-        .notice {
-            margin-top: 30px;
-            font-weight: 600;
-            display: inline-block;
-            padding: 12px 25px;
-            border: 2px solid white;
-            border-radius: 15px;
-            background-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            color: #3E2723;
-            font-size: 18px;
-        }
+    button:hover {
+      background: #ffcf6f;
+      color: #000;
+      transform: scale(1.1);
+    }
 
-        .content {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            margin-top: 30px;
-            flex-wrap: wrap;
-            gap: 40px;
-        }
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
 
-        .card {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-            width: 280px;
-            text-align: left;
-            transition: all 0.3s ease;
-        }
+    .data-card {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid #fff;
+      border-radius: 15px;
+      padding: 20px;
+      min-width: 280px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      transition: 0.3s;
+    }
 
-        .card:hover {
-            transform: scale(1.03);
-        }
+    .data-card:hover {
+      transform: scale(1.05);
+    }
 
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            width: 300px;
-        }
+    .calendar {
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid #fff;
+      border-radius: 15px;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      min-width: 300px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
 
-        .calendar div {
-            background-color: white;
-            border-radius: 6px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
+    .calendar-day {
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: 0.3s;
+    }
 
-        .calendar div:hover {
-            background-color: #FFECB3;
-        }
+    .calendar-day:hover {
+      background: rgba(255, 255, 255, 0.6);
+    }
 
-        .present {
-            background-color: #81C784 !important;
-            color: white;
-        }
+    footer {
+      margin-top: 50px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border-top: 1px solid #fff;
+    }
 
-        .absent {
-            background-color: #E57373 !important;
-            color: white;
-        }
+    footer p {
+      margin: 4px 0;
+    }
 
-        footer {
-            margin-top: 50px;
-            font-size: 14px;
-            color: #4E342E;
-        }
-
-        footer small {
-            font-size: 12px;
-            color: #6D4C41;
-        }
-    </style>
+    #note {
+      border: 2px solid white;
+      padding: 10px;
+      width: fit-content;
+      margin: 20px auto;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
-    <h1>🥛 Milk Data Month-wise</h1>
+  <h1>Milk Tracker</h1>
+  <div id="note">Click a month to see data and tracker</div>
 
-    <div class="month-buttons">
-        <button onclick="fetchData('January')">January</button>
-        <button onclick="fetchData('February')">February</button>
-        <button onclick="fetchData('March')">March</button>
-        <button onclick="fetchData('April')">April</button>
-        <button onclick="fetchData('May')">May</button>
-        <button onclick="fetchData('June')">June</button>
-        <button onclick="fetchData('July')">July</button>
-        <button onclick="fetchData('August')">August</button>
-        <button onclick="fetchData('September')">September</button>
-        <button onclick="fetchData('October')">October</button>
-        <button onclick="fetchData('November')">November</button>
-        <button onclick="fetchData('December')">December</button>
-    </div>
+  <div class="month-buttons">
+    <button onclick="loadMonth('January')">January</button>
+    <button onclick="loadMonth('February')">February</button>
+    <button onclick="loadMonth('March')">March</button>
+    <button onclick="loadMonth('April')">April</button>
+    <button onclick="loadMonth('May')">May</button>
+    <button onclick="loadMonth('June')">June</button>
+    <button onclick="loadMonth('July')">July</button>
+    <button onclick="loadMonth('August')">August</button>
+    <button onclick="loadMonth('September')">September</button>
+    <button onclick="loadMonth('October')">October</button>
+    <button onclick="loadMonth('November')">November</button>
+    <button onclick="loadMonth('December')">December</button>
+  </div>
 
-    <p class="notice">Click a month to see milk details and tracker</p>
+  <div class="container">
+    <div id="data" class="data-card"></div>
+    <div id="calendar" class="calendar"></div>
+  </div>
 
-    <div class="content" id="content"></div>
+  <footer>
+    <p><b>Powered by Flask</b></p>
+    <p style="font-size: 14px;">Made by Farhan 💻</p>
+  </footer>
 
-    <footer>
-        Powered by Flask & Google Sheets ⚙️<br>
-        <small>Made by Farhan</small>
-    </footer>
+  <script>
+    let milkData = JSON.parse(localStorage.getItem("milkData")) || {};
 
-    <script>
-        async function fetchData(month) {
-            const response = await fetch(`/data/${month}`);
-            const data = await response.json();
+    function saveTracker(month, date, status) {
+      if (!milkData[month]) milkData[month] = {};
+      milkData[month][date] = status;
+      localStorage.setItem("milkData", JSON.stringify(milkData));
+    }
 
-            if (!data || Object.keys(data).length === 0) {
-                document.getElementById("content").innerHTML = `<p>No data found for ${month}.</p>`;
-                return;
-            }
+    function loadTracker(month) {
+      const days = document.querySelectorAll(".calendar-day");
+      days.forEach(day => {
+        const date = day.dataset.date;
+        if (milkData[month] && milkData[month][date]) {
+          day.style.backgroundColor = milkData[month][date] === "green" ? "lightgreen" : "salmon";
+        } else {
+          day.style.backgroundColor = "";
+        }
+      });
+    }
 
-            const card = `
-                <div class="card">
-                    <h3>${month} Milk Details</h3>
-                    <p><strong>Paid:</strong> ${data.PAID}</p>
-                    <p><strong>No. of Days in Month:</strong> ${data["NO. OF DAYS IN MONTH"]}</p>
-                    <p><strong>No. of Days Absent:</strong> ${data["NO. OF DAYS ABSENT"]}</p>
-                    <p><strong>No. of Days Coming:</strong> ${data["NO. OF DAYS COMING"]}</p>
-                    <p><strong>Amount:</strong> ${data.AMOUNT}</p>
-                    <p><strong>Payment Mode:</strong> ${data["PAYMENT MODE"]}</p>
-                </div>
+    function loadCalendar(month) {
+      const calendar = document.getElementById("calendar");
+      calendar.innerHTML = "";
+      const today = new Date();
+      const year = today.getFullYear();
+      const monthIndex = new Date(`${month} 1, ${year}`).getMonth();
+      const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+
+      for (let i = 1; i <= daysInMonth; i++) {
+        const div = document.createElement("div");
+        div.classList.add("calendar-day");
+        div.dataset.date = i;
+        div.innerText = i;
+        calendar.appendChild(div);
+      }
+
+      loadTracker(month);
+    }
+
+    function loadMonth(month) {
+      fetch(`/month/${month}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById("data").innerHTML = `<h3>${data.error}</h3>`;
+          } else {
+            document.getElementById("data").innerHTML = `
+              <h2>${data["MONTH"]}</h2>
+              <p><b>Paid:</b> ${data["PAID"]}</p>
+              <p><b>No. of Days in Month:</b> ${data["NO. OF DAYS IN MONTH"]}</p>
+              <p><b>No. of Days Absent:</b> ${data["NO. OF DAYS ABSENT"]}</p>
+              <p><b>No. of Days Coming:</b> ${data["NO. OF DAYS COMING"]}</p>
+              <p><b>Amount:</b> ${data["AMOUNT"]}</p>
+              <p><b>Payment Mode:</b> ${data["PAYMENT MODE"] || "N/A"}</p>
             `;
+            loadCalendar(month);
+          }
+        })
+        .catch(() => {
+          document.getElementById("data").innerHTML = "<h3>Error loading data</h3>";
+        });
+    }
 
-            const totalDays = parseInt(data["NO. OF DAYS IN MONTH"]);
-            let calendar = `<div class="card"><h3>Milk Tracker</h3><div class="calendar">`;
+    document.addEventListener("click", function (e) {
+      if (e.target.classList.contains("calendar-day")) {
+        const day = e.target;
+        const month = document.querySelector("#data h2")?.textContent?.trim();
+        if (!month) return;
 
-            for (let i = 1; i <= totalDays; i++) {
-                calendar += `<div onclick="toggleDay(this)">${i}</div>`;
-            }
-            calendar += `</div></div>`;
-
-            document.getElementById("content").innerHTML = card + calendar;
+        if (day.style.backgroundColor === "lightgreen") {
+          day.style.backgroundColor = "salmon";
+          saveTracker(month, day.dataset.date, "red");
+        } else if (day.style.backgroundColor === "salmon") {
+          day.style.backgroundColor = "";
+          saveTracker(month, day.dataset.date, "");
+        } else {
+          day.style.backgroundColor = "lightgreen";
+          saveTracker(month, day.dataset.date, "green");
         }
-
-        function toggleDay(cell) {
-            if (cell.classList.contains('present')) {
-                cell.classList.remove('present');
-                cell.classList.add('absent');
-            } else if (cell.classList.contains('absent')) {
-                cell.classList.remove('absent');
-            } else {
-                cell.classList.add('present');
-            }
-        }
-    </script>
+      }
+    });
+  </script>
 </body>
 </html>
+
+
+
